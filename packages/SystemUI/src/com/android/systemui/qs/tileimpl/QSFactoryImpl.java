@@ -36,6 +36,7 @@ import com.android.systemui.qs.tiles.AntiFlickerTile;
 import com.android.systemui.qs.tiles.AODTile;
 import com.android.systemui.qs.tiles.BatterySaverTile;
 import com.android.systemui.qs.tiles.BluetoothTile;
+import com.android.systemui.qs.tiles.CPUInfoTile;
 import com.android.systemui.qs.tiles.CaffeineTile;
 import com.android.systemui.qs.tiles.CameraToggleTile;
 import com.android.systemui.qs.tiles.CastTile;
@@ -123,6 +124,7 @@ public class QSFactoryImpl implements QSFactory {
     private final Provider<AntiFlickerTile> mAntiFlickerTileProvider;
     private final Provider<DataSwitchTile> mDataSwitchTileProvider;
     private final Provider<AutoBrightnessTile> mAutoBrightnessTileProvider;
+    private final Provider<CPUInfoTile> mCPUInfoTileProvider;
 
     private final Lazy<QSHost> mQsHostLazy;
     private final Provider<CustomTile.Builder> mCustomTileBuilderProvider;
@@ -172,7 +174,8 @@ public class QSFactoryImpl implements QSFactory {
             Provider<ReadingModeTile> readingModeTileProvider,
             Provider<AntiFlickerTile> antiFlickerTileProvider,
             Provider<DataSwitchTile> dataSwitchTileProvider,
-            Provider<AutoBrightnessTile> autoBrightnessTileProvider) {
+            Provider<AutoBrightnessTile> autoBrightnessTileProvider,
+            Provider<CPUInfoTile> cpuInfoTileProvider) {
         mQsHostLazy = qsHostLazy;
         mCustomTileBuilderProvider = customTileBuilderProvider;
 
@@ -218,6 +221,7 @@ public class QSFactoryImpl implements QSFactory {
         mAntiFlickerTileProvider = antiFlickerTileProvider;
         mDataSwitchTileProvider = dataSwitchTileProvider;
         mAutoBrightnessTileProvider = autoBrightnessTileProvider;
+        mCPUInfoTileProvider = cpuInfoTileProvider;
     }
 
     /** Creates a tile with a type based on {@code tileSpec} */
@@ -318,6 +322,8 @@ public class QSFactoryImpl implements QSFactory {
                 return mDataSwitchTileProvider.get();
             case "autobrightness":
                 return mAutoBrightnessTileProvider.get();
+            case "cpuinfo":
+                return mCPUInfoTileProvider.get();
         }
         // Custom tiles
         if (tileSpec.startsWith(CustomTile.PREFIX)) {
