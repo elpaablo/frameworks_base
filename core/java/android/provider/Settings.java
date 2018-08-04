@@ -6138,6 +6138,102 @@ public final class Settings {
         public static final String MEDIA_ARTWORK_BLUR_RADIUS = "media_artwork_blur_radius";
 
         /**
+         * Whether to show the clock in the right or left position or show it in the center
+         * 0: show the clock in the right position (LTR)
+         * 1: show the clock in the center
+         * 2: show the clock in the left position (LTR)
+         * 3: hide the clock
+         * default: 2
+         * @hide
+         */
+        public static final String STATUS_BAR_CLOCK = "status_bar_clock";
+
+        /**
+         * Whether to show seconds next to clock in status bar
+         * 0 - hide (default)
+         * 1 - show
+         * @hide
+         */
+        public static final String STATUS_BAR_CLOCK_SECONDS = "status_bar_clock_seconds";
+
+        /**
+         * AM/PM style
+         * 0 - Normal
+         * 1 - Small
+         * 2 - hide (default)
+         * @hide
+         */
+        public static final String STATUS_BAR_AM_PM = "status_bar_am_pm";
+
+        /**
+         * Shows custom date before clock time
+         * 0 - No Date
+         * 1 - Small Date
+         * 2 - Normal Date
+         * @hide
+         */
+        public static final String STATUS_BAR_CLOCK_DATE_DISPLAY = "status_bar_clock_date_display";
+
+        /**
+         * Sets the date string style
+         * 0 - Regular style
+         * 1 - Lowercase
+         * 2 - Uppercase
+         * @hide
+         */
+        public static final String STATUS_BAR_CLOCK_DATE_STYLE = "status_bar_clock_date_style";
+
+        /**
+         * Position of date
+         * 0 - Left of clock
+         * 1 - Right of clock
+         * @hide
+         */
+        public static final String STATUS_BAR_CLOCK_DATE_POSITION = "status_bar_clock_date_position";
+
+        /**
+         * Stores the java DateFormat string for the date
+         * @hide
+         */
+        public static final String STATUS_BAR_CLOCK_DATE_FORMAT = "status_bar_clock_date_format";
+
+        /**
+         * Whether to auto hide clock
+         * @hide
+         */
+        public static final String STATUS_BAR_CLOCK_AUTO_HIDE = "status_bar_clock_auto_hide";
+
+        /** @hide */
+        public static final String STATUS_BAR_CLOCK_AUTO_HIDE_HDURATION = "status_bar_clock_auto_hide_hduration";
+
+        /** @hide */
+        public static final String STATUS_BAR_CLOCK_AUTO_HIDE_SDURATION = "status_bar_clock_auto_hide_sduration";
+
+        /**
+         * Whether to display QS clock
+         * @hide
+         */
+        public static final String SHOW_QS_CLOCK = "show_qs_clock";
+
+        /**
+         * Whether to display QS date
+         * @hide
+         */
+        public static final String SHOW_QS_DATE = "show_qs_date";
+
+        /**
+         * Clock font size
+         * @hide
+         */
+        public static final String STATUS_BAR_CLOCK_SIZE = "status_bar_clock_size";
+
+        /**
+         * Clock font size QS
+         * @hide
+         */
+        public static final String QS_HEADER_CLOCK_SIZE = "qs_header_clock_size";
+
+        /**
          * Keys we no longer back up under the current schema, but want to continue to
          * process when restoring historical backup datasets.
          *
@@ -6314,6 +6410,20 @@ public final class Settings {
             PRIVATE_SETTINGS.add(ADAPTIVE_PLAYBACK_ENABLED);
             PRIVATE_SETTINGS.add(ADAPTIVE_PLAYBACK_TIMEOUT);
             PRIVATE_SETTINGS.add(STATUS_BAR_BRIGHTNESS_CONTROL);
+            PRIVATE_SETTINGS.add(STATUS_BAR_CLOCK);
+            PRIVATE_SETTINGS.add(STATUS_BAR_CLOCK_SECONDS);
+            PRIVATE_SETTINGS.add(STATUS_BAR_AM_PM);
+            PRIVATE_SETTINGS.add(STATUS_BAR_CLOCK_DATE_DISPLAY);
+            PRIVATE_SETTINGS.add(STATUS_BAR_CLOCK_DATE_STYLE);
+            PRIVATE_SETTINGS.add(STATUS_BAR_CLOCK_DATE_POSITION);
+            PRIVATE_SETTINGS.add(STATUS_BAR_CLOCK_DATE_FORMAT);
+            PRIVATE_SETTINGS.add(STATUS_BAR_CLOCK_AUTO_HIDE);
+            PRIVATE_SETTINGS.add(STATUS_BAR_CLOCK_AUTO_HIDE_HDURATION);
+            PRIVATE_SETTINGS.add(STATUS_BAR_CLOCK_AUTO_HIDE_SDURATION);
+            PRIVATE_SETTINGS.add(SHOW_QS_CLOCK);
+            PRIVATE_SETTINGS.add(SHOW_QS_DATE);
+            PRIVATE_SETTINGS.add(STATUS_BAR_CLOCK_SIZE);
+            PRIVATE_SETTINGS.add(QS_HEADER_CLOCK_SIZE);
         }
         /**
          * These entries are considered common between the personal and the managed profile,

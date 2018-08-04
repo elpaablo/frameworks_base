@@ -61,9 +61,6 @@ public class PhoneStatusBarView extends FrameLayout implements Callbacks {
     private final StatusBarContentInsetsProvider mContentInsetsProvider;
 
     private DarkReceiver mBattery;
-    private DarkReceiver mClock;
-    private DarkReceiver mClockCentre;
-    private DarkReceiver mClockRight;
     private int mRotationOrientation = -1;
     private RotationButtonController mRotationButtonController;
     @Nullable
@@ -138,9 +135,6 @@ public class PhoneStatusBarView extends FrameLayout implements Callbacks {
     public void onFinishInflate() {
         super.onFinishInflate();
         mBattery = findViewById(R.id.battery);
-        mClock = findViewById(R.id.clock);
-        mClockCentre = findViewById(R.id.center_clock);
-        mClockRight = findViewById(R.id.right_clock);
         mCutoutSpace = findViewById(R.id.cutout_space_view);
 
         updateResources();
@@ -151,9 +145,6 @@ public class PhoneStatusBarView extends FrameLayout implements Callbacks {
         super.onAttachedToWindow();
         // Always have Battery meters in the status bar observe the dark/light modes.
         Dependency.get(DarkIconDispatcher.class).addDarkReceiver(mBattery);
-        Dependency.get(DarkIconDispatcher.class).addDarkReceiver(mClock);
-        Dependency.get(DarkIconDispatcher.class).addDarkReceiver(mClockCentre);
-        Dependency.get(DarkIconDispatcher.class).addDarkReceiver(mClockRight);
         if (updateDisplayParameters()) {
             updateLayoutForCutout();
         }
@@ -167,9 +158,6 @@ public class PhoneStatusBarView extends FrameLayout implements Callbacks {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         Dependency.get(DarkIconDispatcher.class).removeDarkReceiver(mBattery);
-        Dependency.get(DarkIconDispatcher.class).removeDarkReceiver(mClock);
-        Dependency.get(DarkIconDispatcher.class).removeDarkReceiver(mClockCentre);
-        Dependency.get(DarkIconDispatcher.class).removeDarkReceiver(mClockRight);
         mDisplayCutout = null;
 
         if (mRotationButtonController != null) {

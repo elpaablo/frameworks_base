@@ -45,9 +45,9 @@ import static com.android.systemui.statusbar.phone.BarTransitions.MODE_OPAQUE;
 import static com.android.systemui.statusbar.phone.BarTransitions.MODE_SEMI_TRANSPARENT;
 import static com.android.systemui.statusbar.phone.BarTransitions.MODE_TRANSPARENT;
 import static com.android.systemui.statusbar.phone.BarTransitions.TransitionMode;
-import static com.android.systemui.statusbar.policy.Clock.POSITION_CLOCK_DEFAULT;
-import static com.android.systemui.statusbar.policy.Clock.POSITION_CLOCK_LEFT;
-import static com.android.systemui.statusbar.policy.Clock.POSITION_CLOCK_CENTER;
+import static com.android.systemui.statusbar.phone.ClockController.CLOCK_POSITION_DEFAULT;
+import static com.android.systemui.statusbar.phone.ClockController.CLOCK_POSITION_LEFT;
+import static com.android.systemui.statusbar.phone.ClockController.CLOCK_POSITION_CENTER;
 
 import android.annotation.Nullable;
 import android.app.ActivityManager;
@@ -2020,13 +2020,13 @@ public class CentralSurfacesImpl extends CoreStartable implements
 
     private boolean isCenteredClock() {
         return Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.STATUSBAR_CLOCK_POSITION, POSITION_CLOCK_DEFAULT)
-                == POSITION_CLOCK_CENTER;
+                Settings.System.STATUS_BAR_CLOCK, CLOCK_POSITION_DEFAULT)
+                == CLOCK_POSITION_CENTER;
     }
 
     private void moveClockToLeft() {
         Settings.System.putInt(mContext.getContentResolver(),
-                Settings.System.STATUSBAR_CLOCK_POSITION, POSITION_CLOCK_LEFT);
+                Settings.System.STATUS_BAR_CLOCK, CLOCK_POSITION_LEFT);
     }
 
     private void updateCutoutOverlay(boolean displayCutoutHidden) {

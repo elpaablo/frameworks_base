@@ -19,8 +19,8 @@ package com.android.systemui.statusbar.policy;
 import static com.android.systemui.statusbar.StatusBarIconView.STATE_DOT;
 import static com.android.systemui.statusbar.StatusBarIconView.STATE_HIDDEN;
 import static com.android.systemui.statusbar.StatusBarIconView.STATE_ICON;
-import static com.android.systemui.statusbar.policy.Clock.POSITION_CLOCK_DEFAULT;
-import static com.android.systemui.statusbar.policy.Clock.POSITION_CLOCK_LEFT;
+import static com.android.systemui.statusbar.phone.ClockController.CLOCK_POSITION_DEFAULT;
+import static com.android.systemui.statusbar.phone.ClockController.CLOCK_POSITION_LEFT;
 
 import android.content.Context;
 import android.graphics.Rect;
@@ -139,13 +139,13 @@ public class StatusBarNetworkTraffic extends NetworkTraffic implements DarkRecei
 
     private boolean isClockOnLeft() {
         return Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.STATUSBAR_CLOCK_POSITION, POSITION_CLOCK_DEFAULT)
-                == POSITION_CLOCK_LEFT;
+                Settings.System.STATUS_BAR_CLOCK, CLOCK_POSITION_DEFAULT)
+                == CLOCK_POSITION_LEFT;
     }
 
     private void moveClockToLeft() {
         Settings.System.putInt(mContext.getContentResolver(),
-                Settings.System.STATUSBAR_CLOCK_POSITION, POSITION_CLOCK_LEFT);
+                Settings.System.STATUS_BAR_CLOCK, CLOCK_POSITION_LEFT);
     }
 
     @Override
