@@ -22,4 +22,8 @@
     <string name="config_SmartChargingSuspendValue" translatable="false">1</string>
     <string name="config_SmartChargingResumeValue" translatable="false">0</string>
 
+    <!-- Smart cutoff -->
+    <integer name="config_smartCutoffTemperature">40</integer>
+    <integer name="config_smartCutoffResumeTemperature">35</integer>
+
 </resources>
