@@ -24,13 +24,9 @@
     </style>
 
     <style name="TextAppearance.EntityHeaderTitle"
-<<<<<<< HEAD
-           parent="@android:style/TextAppearance.DeviceDefault.WindowTitle">
-=======
            parent="@android:style/TextAppearance.Material.Subhead">
         <item name="android:textAlignment">viewStart</item>
         <item name="android:fontFamily">@*android:string/config_headlineFontFamilyMedium</item>
->>>>>>> ded125c91aa1 (SettingsLib : About Alpha released [2/2])
         <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="android:textSize">20sp</item>
     </style>
