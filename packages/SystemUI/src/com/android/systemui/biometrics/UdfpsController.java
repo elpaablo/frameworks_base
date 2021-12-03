@@ -38,6 +38,7 @@ import android.hardware.fingerprint.FingerprintManager;
 import android.hardware.fingerprint.IUdfpsOverlayController;
 import android.hardware.fingerprint.IUdfpsOverlayControllerCallback;
 import android.os.Handler;
+import android.os.UserHandle;
 import android.os.PowerManager;
 import android.os.Process;
 import android.os.Trace;
@@ -105,6 +106,8 @@ public class UdfpsController implements DozeReceiver {
 
     // Minimum required delay between consecutive touch logs in milliseconds.
     private static final long MIN_TOUCH_LOG_INTERVAL = 50;
+
+    private static final String PULSE_ACTION = "com.android.systemui.doze.pulse";
 
     private final Context mContext;
     private final Execution mExecution;
@@ -263,8 +266,13 @@ public class UdfpsController implements DozeReceiver {
                     return;
                 }
                 if (vendorCode == mUdfpsVendorCode) {
-                    mPowerManager.wakeUp(mSystemClock.uptimeMillis(),
-                            PowerManager.WAKE_REASON_GESTURE, TAG);
+                    if (mContext.getResources().getBoolean(R.bool.config_pulseOnFingerDown)) {
+                        mContext.sendBroadcastAsUser(
+                              new Intent(PULSE_ACTION), new UserHandle(UserHandle.USER_CURRENT));
+                    } else {
+                        mPowerManager.wakeUp(mSystemClock.uptimeMillis(),
+                              PowerManager.WAKE_REASON_GESTURE, TAG);
+                    }
                     onAodInterrupt(0, 0, 0, 0);
                 }
             }
