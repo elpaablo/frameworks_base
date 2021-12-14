@@ -16,6 +16,7 @@
 
 package com.android.server.am;
 
+import android.os.Build;
 import android.os.Trace;
 
 import java.util.UUID;
@@ -30,7 +31,7 @@ public class TraceErrorLogger {
     private static final int PLACEHOLDER_VALUE = 1;
 
     public boolean isAddErrorIdEnabled() {
-        return true;
+        return Build.IS_ENG;
     }
 
     /**

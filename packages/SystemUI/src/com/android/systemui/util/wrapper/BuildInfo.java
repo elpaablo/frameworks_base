@@ -30,10 +30,8 @@ public class BuildInfo {
     public BuildInfo() {
     }
 
-    /** @see Build#IS_DEBUGGABLE */
+    /** @see Build.IS_ENG */
     public boolean isDebuggable() {
-        // Build.IS_DEBUGGABLE is inlined by the gradle build, causing this to incorrectly
-        // return false when using sysui-studio.
-        return Build.isDebuggable();
+        return Build.IS_ENG;
     }
 }
