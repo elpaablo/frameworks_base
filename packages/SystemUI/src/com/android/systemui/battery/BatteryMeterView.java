@@ -63,8 +63,6 @@ import com.android.systemui.plugins.DarkIconDispatcher;
 import com.android.systemui.plugins.DarkIconDispatcher.DarkReceiver;
 import com.android.systemui.statusbar.policy.BatteryController;
 
-import lineageos.providers.LineageSettings;
-
 import java.io.PrintWriter;
 import java.lang.annotation.Retention;
 import java.text.NumberFormat;
@@ -436,7 +434,8 @@ public class BatteryMeterView extends LinearLayout implements DarkReceiver {
             // to load its emoji colored variant with the uFE0E flag
             String bolt = "\u26A1";
             CharSequence mChargeIndicator = mCharging && (mBatteryStyle == BATTERY_STYLE_HIDDEN ||
-                mBatteryStyle == BATTERY_STYLE_TEXT) ? (bolt + " ") : "";
+                mBatteryStyle == BATTERY_STYLE_TEXT || mBatteryStyle == BATTERY_STYLE_FULL_CIRCLE)
+                ? (bolt + " ") : "";
                 if (!TextUtils.equals(mBatteryPercentView.getText(), text)) {
                   mBatteryPercentView.setText(mChargeIndicator + text);
        	}
