@@ -93,5 +93,11 @@ public class SystemSettings {
         Settings.System.NETWORK_TRAFFIC_AUTOHIDE_THRESHOLD,
         Settings.System.FULLSCREEN_GESTURES,
         Settings.System.KEYGAURD_MEDIA_ART,
+        Settings.System.SMART_CHARGING,
+        Settings.System.SMART_CHARGING_LEVEL,
+        Settings.System.SMART_CHARGING_RESUME_LEVEL,
+        Settings.System.SMART_CUTOFF,
+        Settings.System.SMART_CUTOFF_TEMPERATURE,
+        Settings.System.SMART_CUTOFF_RESUME_TEMPERATURE,
     };
 }
