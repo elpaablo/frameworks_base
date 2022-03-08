@@ -101,6 +101,9 @@ public class NavigationBarView extends FrameLayout implements TunerService.Tunab
     private static final String NAVIGATION_BAR_MENU_ARROW_KEYS =
             "customsystem:" + Settings.System.NAVIGATION_BAR_MENU_ARROW_KEYS;
 
+    private static final String NAVBAR_STYLE =
+            "system:" + Settings.System.NAVBAR_STYLE;
+
     final static boolean ALTERNATE_CAR_MODE_UI = false;
 
     // The current view is one of mHorizontal or mVertical depending on the current configuration
@@ -1117,7 +1120,7 @@ public class NavigationBarView extends FrameLayout implements TunerService.Tunab
         requestApplyInsets();
         reorient();
         final TunerService tunerService = Dependency.get(TunerService.class);
-        tunerService.addTunable(this, NAVIGATION_BAR_MENU_ARROW_KEYS);
+        tunerService.addTunable(this, NAVIGATION_BAR_MENU_ARROW_KEYS, NAVBAR_STYLE);
         if (mRotationButtonController != null) {
             mRotationButtonController.registerListeners();
         }
@@ -1144,6 +1147,8 @@ public class NavigationBarView extends FrameLayout implements TunerService.Tunab
         if (NAVIGATION_BAR_MENU_ARROW_KEYS.equals(key)) {
             mShowCursorKeys = TunerService.parseIntegerSwitch(newValue, false);
             setNavigationIconHints(mNavigationIconHints);
+        } else if (NAVBAR_STYLE.equals(key)) {
+            reloadNavIcons();
         }
     }
 
