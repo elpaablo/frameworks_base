@@ -81,6 +81,7 @@ public class PixelPropsUtils {
     // Packages to Keep with original device
     private static final Map<String, ArrayList<String>> propsToKeep;
     private static final String[] packagesToKeep = {
+        PACKAGE_GMS,
         "com.google.android.GoogleCamera",
         "com.google.android.GoogleCamera.Cameight",
         "com.google.android.GoogleCamera.Go",
@@ -245,12 +246,9 @@ public class PixelPropsUtils {
                 setPropValue(key, value);
             }
         }
-        if (isPixelDevice){
-            if (packageName.equals(PACKAGE_GMS) &&
-                    processName.equals(PACKAGE_GMS + ".unstable")){
-                setPropValue("MODEL", Build.MODEL + " ");
-            }
-        } else {
+        if (sIsGms) {
+                    setPropValue("MODEL", Build.MODEL + " ");
+                    } else {
             if (Arrays.asList(packagesToChangeROG1).contains(packageName)) {
                 if (DEBUG) Log.d(TAG, "Defining props for: " + packageName);
                 for (Map.Entry<String, Object> prop : propsToChangeROG1.entrySet()) {
