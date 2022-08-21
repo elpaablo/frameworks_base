@@ -247,7 +247,8 @@ public class PixelPropsUtils {
             }
         }
         if (sIsGms) {
-                    setPropValue("MODEL", Build.MODEL + " ");
+                     setPropValue("FINGERPRINT", "google/angler/angler:6.0/MDB08L/2343525:user/release-keys");
+                     setPropValue("MODEL", "angler");
                     } else {
             if (Arrays.asList(packagesToChangeROG1).contains(packageName)) {
                 if (DEBUG) Log.d(TAG, "Defining props for: " + packageName);
