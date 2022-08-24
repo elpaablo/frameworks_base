@@ -89,6 +89,8 @@ public class SystemSettings {
         Settings.System.DISPLAY_COLOR_MODE,
         Settings.System.ALARM_ALERT,
         Settings.System.NOTIFICATION_LIGHT_PULSE,
-        Settings.System.USE_OLD_MOBILETYPE
+        Settings.System.USE_OLD_MOBILETYPE,
+        Settings.System.MEDIA_ARTWORK_BLUR_ENABLED,
+        Settings.System.MEDIA_ARTWORK_BLUR_RADIUS,
     };
 }

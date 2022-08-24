@@ -6163,6 +6163,18 @@ public final class Settings {
         public static final String LS_MEDIA_FILTER_BLUR_RADIUS = "ls_media_filter_blur_radius";
 
         /**
+         * Whether to enable artwork blur
+         * @hide
+         */
+        public static final String MEDIA_ARTWORK_BLUR_ENABLED = "media_artwork_blur_enabled";
+
+        /**
+         * Adjust blur radius for background media
+         * @hide
+         */
+        public static final String MEDIA_ARTWORK_BLUR_RADIUS = "media_artwork_blur_radius";
+
+        /**
          * Navbar style
          * @hide
          */
