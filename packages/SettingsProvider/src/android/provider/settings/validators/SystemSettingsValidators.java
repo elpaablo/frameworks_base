@@ -219,5 +219,6 @@ public class SystemSettingsValidators {
         VALIDATORS.put(System.SMART_CUTOFF, BOOLEAN_VALIDATOR);
         VALIDATORS.put(System.SMART_CUTOFF_TEMPERATURE, new InclusiveIntegerRangeValidator(1, 50));
         VALIDATORS.put(System.SMART_CUTOFF_RESUME_TEMPERATURE, new InclusiveIntegerRangeValidator(0, 49));
+        VALIDATORS.put(System.SCREEN_OFF_UDFPS, BOOLEAN_VALIDATOR);
     }
 }

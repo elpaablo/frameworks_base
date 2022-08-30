@@ -99,5 +99,6 @@ public class SystemSettings {
         Settings.System.SMART_CUTOFF,
         Settings.System.SMART_CUTOFF_TEMPERATURE,
         Settings.System.SMART_CUTOFF_RESUME_TEMPERATURE,
+        Settings.System.SCREEN_OFF_UDFPS,
     };
 }
