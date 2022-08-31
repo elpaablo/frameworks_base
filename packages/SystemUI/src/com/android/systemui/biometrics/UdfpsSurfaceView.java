@@ -51,9 +51,6 @@ public class UdfpsSurfaceView extends SurfaceView implements SurfaceHolder.Callb
     @Nullable private Runnable mOnIlluminatedRunnable;
     boolean mAwaitingSurfaceToStartIllumination;
     boolean mHasValidSurface;
-
-    private Drawable mUdfpsIconPressed;
-
     public UdfpsSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
         // Make this SurfaceView draw on top of everything else in this window. This allows us to
@@ -68,8 +65,6 @@ public class UdfpsSurfaceView extends SurfaceView implements SurfaceHolder.Callb
         mSensorPaint.setAntiAlias(true);
         mSensorPaint.setColor(context.getColor(R.color.config_udfpsColor));
         mSensorPaint.setStyle(Paint.Style.FILL);
-
-        mUdfpsIconPressed = context.getDrawable(R.drawable.udfps_icon_pressed);
     }
     @Override public void surfaceCreated(SurfaceHolder holder) {
         mHasValidSurface = true;
@@ -124,13 +119,6 @@ public class UdfpsSurfaceView extends SurfaceView implements SurfaceHolder.Callb
         Canvas canvas = null;
         try {
             canvas = mHolder.lockCanvas();
-            mUdfpsIconPressed.setBounds(
-                    Math.round(sensorRect.left),
-                    Math.round(sensorRect.top),
-                    Math.round(sensorRect.right),
-                    Math.round(sensorRect.bottom)
-            );
-            mUdfpsIconPressed.draw(canvas);
             canvas.drawOval(sensorRect, mSensorPaint);
         } finally {
             // Make sure the surface is never left in a bad state.
