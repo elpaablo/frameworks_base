@@ -262,19 +262,21 @@ public class UdfpsController implements DozeReceiver {
                 });
             } else {
                 boolean acquiredVendor = acquiredInfo == FINGERPRINT_ACQUIRED_VENDOR;
-                if (!acquiredVendor || (!mStatusBarStateController.isDozing() && mScreenOn)) {
-                    return;
-                }
-                if (vendorCode == mUdfpsVendorCode) {
-                    if (mContext.getResources().getBoolean(R.bool.config_pulseOnFingerDown)) {
-                        mContext.sendBroadcastAsUser(
-                              new Intent(PULSE_ACTION), new UserHandle(UserHandle.USER_CURRENT));
-                    } else {
-                        mPowerManager.wakeUp(mSystemClock.uptimeMillis(),
-                              PowerManager.WAKE_REASON_GESTURE, TAG);
+                mFgExecutor.execute(() -> {
+                    if (!acquiredVendor || (!mStatusBarStateController.isDozing() && mScreenOn)) {
+                        return;
                     }
-                    onAodInterrupt(0, 0, 0, 0);
-                }
+                    if (vendorCode == mUdfpsVendorCode) {
+                        if (mContext.getResources().getBoolean(R.bool.config_pulseOnFingerDown)) {
+                            mContext.sendBroadcastAsUser(
+                                  new Intent(PULSE_ACTION), new UserHandle(UserHandle.USER_CURRENT));
+                        } else {
+                            mPowerManager.wakeUp(mSystemClock.uptimeMillis(),
+                                  PowerManager.WAKE_REASON_GESTURE, TAG);
+                        }
+                        onAodInterrupt(0, 0, 0, 0);
+                    }
+                });
             }
         }
 
