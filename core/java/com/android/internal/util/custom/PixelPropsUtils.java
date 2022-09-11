@@ -248,7 +248,9 @@ public class PixelPropsUtils {
         if (sIsGms) {
                      setPropValue("FINGERPRINT", "google/angler/angler:6.0/MDB08L/2343525:user/release-keys");
                      setPropValue("MODEL", "angler");
-                    } else {
+        } else {
+            if (!SystemProperties.getBoolean("persist.sys.pixelprops.games", false))
+                return;
             if (Arrays.asList(packagesToChangeROG1).contains(packageName)) {
                 if (DEBUG) Log.d(TAG, "Defining props for: " + packageName);
                 for (Map.Entry<String, Object> prop : propsToChangeROG1.entrySet()) {
