@@ -256,7 +256,7 @@ public class QuickStatusBarHeader extends FrameLayout implements TunerService.Tu
     }
 
     private void updateBatteryMode() {
-        if (mConfigShowBatteryEstimate) {
+        if (mConfigShowBatteryEstimate && !mHasCenterCutout) {
             mBatteryRemainingIcon.setPercentShowMode(BatteryMeterView.MODE_ESTIMATE);
         } else {
             mBatteryRemainingIcon.setPercentShowMode(BatteryMeterView.MODE_ON);
