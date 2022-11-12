@@ -109,7 +109,7 @@ import kotlin.Unit;
 public class UdfpsController implements DozeReceiver {
     private static final String TAG = "UdfpsController";
     private static final String PULSE_ACTION = "com.android.systemui.doze.pulse";
-    private static final long AOD_INTERRUPT_TIMEOUT_MILLIS = 1000;
+    private static final long AOD_INTERRUPT_TIMEOUT_MILLIS = 500;
 
     // Minimum required delay between consecutive touch logs in milliseconds.
     private static final long MIN_TOUCH_LOG_INTERVAL = 50;
@@ -308,13 +308,13 @@ public class UdfpsController implements DozeReceiver {
             } else {
                 mFgExecutor.execute(() -> {
                     if (acquiredInfo == FINGERPRINT_ACQUIRED_VENDOR && vendorCode == UDFPS_VENDOR_CODE) {
-                        mContext.sendBroadcastAsUser(new Intent(PULSE_ACTION),
-                                new UserHandle(UserHandle.USER_CURRENT));
-                        if((!mScreenOn && isScreenOffUdfpsEnabled()) ||
-                                (mStatusBarStateController.isDozing() && mScreenOn)) {
-                                setDimLayerHbm(ON); // give udfps a push here
+                        if (mStatusBarStateController.isDozing() && mScreenOn) {
+                            onAodInterrupt(0, 0, 0, 0);
+                        } else if (!mScreenOn && isScreenOffUdfpsEnabled()) {
+                            onAodInterrupt(0, 0, 0, 0);
+                            mContext.sendBroadcastAsUser(new Intent(PULSE_ACTION),
+                                    new UserHandle(UserHandle.USER_CURRENT));
                         }
-                        onAodInterrupt(0, 0, 0, 0);
                     }
                 });
             }
@@ -836,6 +836,9 @@ public class UdfpsController implements DozeReceiver {
             return;
         }
 
+        final long requestId = mOverlay != null ? mOverlay.getRequestId() : -1;
+        onFingerDown(requestId, screenX, screenY, minor, major);
+
         if (!mKeyguardUpdateMonitor.isFingerprintDetectionRunning()) {
             if (mFalsingManager.isFalseTouch(LOCK_ICON)) {
                 Log.v(TAG, "aod lock icon long-press rejected by the falsing manager.");
@@ -853,8 +856,6 @@ public class UdfpsController implements DozeReceiver {
             return;
         }
 
-        // TODO(b/225068271): this may not be correct but there isn't a way to track it
-        final long requestId = mOverlay != null ? mOverlay.getRequestId() : -1;
         mAodInterruptRunnable = () -> {
             mIsAodInterruptActive = true;
             // Since the sensor that triggers the AOD interrupt doesn't provide
@@ -863,8 +864,6 @@ public class UdfpsController implements DozeReceiver {
             // cancel the fingerprint scan.
             mCancelAodTimeoutAction = mFgExecutor.executeDelayed(this::onCancelUdfps,
                     AOD_INTERRUPT_TIMEOUT_MILLIS);
-            // using a hard-coded value for major and minor until it is available from the sensor
-            onFingerDown(requestId, screenX, screenY, minor, major);
         };
 
         if (mScreenOn) {
