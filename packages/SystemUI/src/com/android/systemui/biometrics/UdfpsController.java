@@ -47,6 +47,7 @@ import android.os.UserHandle;
 import android.os.VibrationAttributes;
 import android.os.VibrationEffect;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.RotationUtils;
 import android.view.LayoutInflater;
@@ -184,6 +185,7 @@ public class UdfpsController implements DozeReceiver {
     private boolean mShowingUdfpsOverlay;
     private boolean mDcDimmingNeedsHandling;
     private String mDcDimmingPath = "";
+    private boolean mDcDimmingSupported;
 
     private final int ON = 1;
     private final int OFF = 0;
@@ -227,7 +229,7 @@ public class UdfpsController implements DozeReceiver {
             mScreenOn = false;
 
             setUdfpsStatus(OFF);
-            if (!mDcDimmingNeedsHandling && isDcDimmingEnabled())  {
+            if (mDcDimmingSupported && !mDcDimmingNeedsHandling && isDcDimmingEnabled()) {
                 mDcDimmingNeedsHandling = true; // mark to disable
             }
         }
@@ -730,6 +732,7 @@ public class UdfpsController implements DozeReceiver {
         udfpsShell.setUdfpsOverlayController(mUdfpsOverlayController);
 
         mDcDimmingPath = mContext.getResources().getString(R.string.config_dcDimmingSysNode);
+        mDcDimmingSupported = !TextUtils.isEmpty(mDcDimmingPath);
     }
 
     private void disableNightMode() {
@@ -1000,6 +1003,7 @@ public class UdfpsController implements DozeReceiver {
     }
 
     private boolean isDcDimmingEnabled() {
+        if (!mDcDimmingSupported) return false;
         try {
             return String.valueOf(ON).equals(FileUtils.readTextFile(
                     new File(mDcDimmingPath), 1, null));
