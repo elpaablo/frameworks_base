@@ -95,8 +95,12 @@ public class NavigationBarInflaterView extends FrameLayout
 
     private static final String KEY_NAVIGATION_HINT =
             "customsystem:" + Settings.System.NAVIGATION_BAR_HINT;
+    private static final String KEY_HIDE_IME_SPACE =
+            "customsystem:" + Settings.System.HIDE_IME_SPACE_ENABLE;
     private static final String OVERLAY_NAVIGATION_HIDE_HINT =
-            "org.pixelexperience.overlay.navbar.nohint";
+            "org.alpha.overlay.navbar.nohint";
+    private static final String OVERLAY_NAVIGATION_HIDE_HINT_AND_IME =
+            "org.alpha.overlay.navbar.nohint.noime";
 
     protected LayoutInflater mLayoutInflater;
     protected LayoutInflater mLandscapeInflater;
@@ -120,6 +124,7 @@ public class NavigationBarInflaterView extends FrameLayout
     private boolean mInverseLayout;
     private boolean mCompactLayout;
     private static AtomicReference<Boolean> mIsHintEnabledRef;
+    private static AtomicReference<Boolean> mHideImeRef;
 
     public NavigationBarInflaterView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -129,6 +134,7 @@ public class NavigationBarInflaterView extends FrameLayout
         mCompactLayout = Settings.System.getInt(context.getContentResolver(),
                                 Settings.System.NAV_BAR_COMPACT_LAYOUT, 0) != 0;
         mIsHintEnabledRef = new AtomicReference<>(true);
+        mHideImeRef = new AtomicReference<>(false);
     }
 
     @VisibleForTesting
@@ -178,7 +184,6 @@ public class NavigationBarInflaterView extends FrameLayout
     @Override
     public void onNavigationModeChanged(int mode) {
         mNavBarMode = mode;
-        onLikelyDefaultLayoutChange();
         updateHint();
     }
 
@@ -188,6 +193,7 @@ public class NavigationBarInflaterView extends FrameLayout
         Dependency.get(TunerService.class).addTunable(this, NAV_BAR_INVERSE);
         Dependency.get(TunerService.class).addTunable(this, NAV_BAR_COMPACT);
         Dependency.get(TunerService.class).addTunable(this, KEY_NAVIGATION_HINT);
+        Dependency.get(TunerService.class).addTunable(this, KEY_HIDE_IME_SPACE);
     }
 
     @Override
@@ -212,7 +218,10 @@ public class NavigationBarInflaterView extends FrameLayout
             Boolean mIsHintEnabledOld = mIsHintEnabledRef.get();
             mIsHintEnabledRef.compareAndSet(mIsHintEnabledOld, TunerService.parseIntegerSwitch(newValue, true));
             updateHint();
-            onLikelyDefaultLayoutChange();
+        } else if (KEY_HIDE_IME_SPACE.equals(key)) {
+            Boolean mHideImeOld = mHideImeRef.get();
+            mHideImeRef.compareAndSet(mHideImeOld, TunerService.parseIntegerSwitch(newValue, true));
+            updateIme();
         }
         if (QuickStepContract.isGesturalMode(mNavBarMode)) {
             setNavigationBarLayout(newValue);
@@ -290,17 +299,52 @@ public class NavigationBarInflaterView extends FrameLayout
                 ServiceManager.getService(Context.OVERLAY_SERVICE));
         final boolean state = mNavBarMode == NAV_BAR_MODE_GESTURAL && !mIsHintEnabledRef.get();
         final int userId = ActivityManager.getCurrentUser();
+        final String OVERLAY = mHideImeRef.get() ?
+                OVERLAY_NAVIGATION_HIDE_HINT_AND_IME :
+                OVERLAY_NAVIGATION_HIDE_HINT;
         try {
-            iom.setEnabled(OVERLAY_NAVIGATION_HIDE_HINT, state, userId);
+            iom.setEnabled(OVERLAY, state, userId);
+            Log.i(TAG, (state ? "enabling " : "disabling ") + OVERLAY);
             if (state) {
                 // As overlays are also used to apply navigation mode, it is needed to set
                 // our customization overlay to highest priority to ensure it is applied.
-                iom.setHighestPriority(OVERLAY_NAVIGATION_HIDE_HINT, userId);
+                iom.setHighestPriority(OVERLAY, userId);
             }
         } catch (IllegalArgumentException | RemoteException e) {
             Log.e(TAG, "Failed to " + (state ? "enable" : "disable")
-                    + " overlay " + OVERLAY_NAVIGATION_HIDE_HINT + " for user " + userId);
+                    + " overlay " + OVERLAY + " for user " + userId);
         }
+        onLikelyDefaultLayoutChange();
+    }
+
+    private void updateIme() {
+
+        // hide ime is an extension of hide hint
+        if (mIsHintEnabledRef.get()) return;
+
+        final IOverlayManager iom = IOverlayManager.Stub.asInterface(
+                ServiceManager.getService(Context.OVERLAY_SERVICE));
+        final boolean state = mHideImeRef.get();
+        final int userId = ActivityManager.getCurrentUser();
+        try {
+            if (state) {
+                iom.setEnabled(OVERLAY_NAVIGATION_HIDE_HINT, false, userId);
+                iom.setHighestPriority(OVERLAY_NAVIGATION_HIDE_HINT, userId);
+                Log.i(TAG, "disabling HIDE_HINT");
+                iom.setEnabled(OVERLAY_NAVIGATION_HIDE_HINT_AND_IME, true, userId);
+                iom.setHighestPriority(OVERLAY_NAVIGATION_HIDE_HINT_AND_IME, userId);
+                Log.i(TAG, "enabling HIDE_HINT_AND_IME");
+             }
+             else {
+                 iom.setEnabled(OVERLAY_NAVIGATION_HIDE_HINT_AND_IME, false, userId);
+                 Log.i(TAG, "disabling HIDE_HINT_AND_IME");
+             }
+        } catch (IllegalArgumentException | RemoteException e) {
+            Log.e(TAG, "Failed to " + (state ? "enable" : "disable")
+                    + " overlay " + OVERLAY_NAVIGATION_HIDE_HINT_AND_IME
+                    + " for user " + userId);
+        }
+        onLikelyDefaultLayoutChange();
     }
 
     private void initiallyFill(ButtonDispatcher buttonDispatcher) {
