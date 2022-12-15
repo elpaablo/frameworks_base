@@ -100,6 +100,7 @@ public final class Trace {
     /** @hide */
     public static final long TRACE_TAG_VIBRATOR = 1L << 23;
     /** @hide */
+    @SystemApi(client = MODULE_LIBRARIES)
     public static final long TRACE_TAG_AIDL = 1L << 24;
     /** @hide */
     public static final long TRACE_TAG_NNAPI = 1L << 25;
@@ -160,6 +161,10 @@ public final class Trace {
     @UnsupportedAppUsage
     @SystemApi(client = MODULE_LIBRARIES)
     public static boolean isTagEnabled(long traceTag) {
+        if (!Build.IS_DEBUGGABLE) {
+            return false;
+        }
+
         long tags = nativeGetEnabledTags();
         return (tags & traceTag) != 0;
     }

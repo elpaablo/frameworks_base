@@ -988,9 +988,9 @@ public class WindowManagerService extends IWindowManager.Stub
     PowerManager mPowerManager;
     PowerManagerInternal mPowerManagerInternal;
 
-    private float mWindowAnimationScaleSetting = 1.0f;
-    private float mTransitionAnimationScaleSetting = 1.0f;
-    private float mAnimatorDurationScaleSetting = 1.0f;
+    private float mWindowAnimationScaleSetting = 0.5f;
+    private float mTransitionAnimationScaleSetting = 0.5f;
+    private float mAnimatorDurationScaleSetting = 0.5f;
     private boolean mAnimationsDisabled = false;
     boolean mPointerLocationEnabled = false;
 
@@ -3596,6 +3596,14 @@ public class WindowManagerService extends IWindowManager.Stub
         // Pass in the UI context, since ShutdownThread requires it (to show UI).
         ShutdownThread.reboot(ActivityThread.currentActivityThread().getSystemUiContext(),
                 PowerManager.SHUTDOWN_USER_REQUESTED, confirm);
+    }
+
+    // Called by window manager policy.  Not exposed externally.
+    @Override
+    public void reboot(boolean confirm, String reason) {
+        // Pass in the UI context, since ShutdownThread requires it (to show UI).
+        ShutdownThread.rebootCustom(ActivityThread.currentActivityThread().getSystemUiContext(),
+                reason, confirm);
     }
 
     // Called by window manager policy.  Not exposed externally.
@@ -7018,6 +7026,7 @@ public class WindowManagerService extends IWindowManager.Stub
         return mRoot.getDisplayContent(DEFAULT_DISPLAY);
     }
 
+    @Override
     public void onOverlayChanged() {
         // Post to display thread so it can get the latest display info.
         mH.post(() -> {

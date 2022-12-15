@@ -64,7 +64,7 @@ import com.android.systemui.statusbar.policy.KeyguardStateController;
 import javax.inject.Inject;
 
 /** Quick settings tile: Cellular **/
-public class CellularTile extends QSTileImpl<SignalState> {
+public class CellularTile extends SecureQSTile<SignalState> {
     private static final String ENABLE_SETTINGS_DATA_PLAN = "enable.settings.data.plan";
 
     private final NetworkController mController;
@@ -84,10 +84,9 @@ public class CellularTile extends QSTileImpl<SignalState> {
             QSLogger qsLogger,
             NetworkController networkController,
             KeyguardStateController keyguardStateController
-
     ) {
         super(host, backgroundLooper, mainHandler, falsingManager, metricsLogger,
-                statusBarStateController, activityStarter, qsLogger);
+                statusBarStateController, activityStarter, qsLogger, keyguardStateController);
         mController = networkController;
         mKeyguard = keyguardStateController;
         mDataController = mController.getMobileDataController();
@@ -109,11 +108,15 @@ public class CellularTile extends QSTileImpl<SignalState> {
         if (getState().state == Tile.STATE_UNAVAILABLE) {
             return new Intent(Settings.ACTION_WIRELESS_SETTINGS);
         }
-        return getCellularSettingIntent();
+        return new Intent(Settings.Panel.ACTION_MOBILE_DATA);
     }
 
     @Override
-    protected void handleClick(@Nullable View view) {
+    protected void handleClick(@Nullable View view, boolean keyguardShowing) {
+        if (checkKeyguard(view, keyguardShowing)) {
+            return;
+        }
+
         if (getState().state == Tile.STATE_UNAVAILABLE) {
             return;
         }
@@ -170,8 +173,8 @@ public class CellularTile extends QSTileImpl<SignalState> {
             cb = mSignalCallback.mInfo;
         }
 
+        DataUsageController.DataUsageInfo carrierLabelInfo = mDataController.getDataUsageInfo();
         final Resources r = mContext.getResources();
-        state.label = r.getString(R.string.mobile_data);
         boolean mobileDataEnabled = mDataController.isMobileDataSupported()
                 && mDataController.isMobileDataEnabled();
         state.value = mobileDataEnabled;
@@ -179,8 +182,14 @@ public class CellularTile extends QSTileImpl<SignalState> {
         state.activityOut = mobileDataEnabled && cb.activityOut;
         state.expandedAccessibilityClassName = Switch.class.getName();
         if (cb.noSim) {
+            state.label = r.getString(R.string.mobile_data);
             state.icon = ResourceIcon.get(R.drawable.ic_qs_no_sim);
         } else {
+            if (carrierLabelInfo != null) {
+                state.label = carrierLabelInfo.carrier;
+            } else {
+                state.label = r.getString(R.string.mobile_data);
+            }
             state.icon = ResourceIcon.get(R.drawable.ic_swap_vert);
         }
 

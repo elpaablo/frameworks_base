@@ -138,6 +138,7 @@ import com.android.internal.widget.LockSettingsInternal;
 import com.android.internal.widget.LockscreenCredential;
 import com.android.internal.widget.RebootEscrowListener;
 import com.android.internal.widget.VerifyCredentialResponse;
+import com.android.server.app.AppLockManagerServiceInternal;
 import com.android.server.LocalServices;
 import com.android.server.ServiceThread;
 import com.android.server.SystemService;
@@ -1603,6 +1604,10 @@ public class LockSettingsService extends ILockSettings.Stub {
                 && getSeparateProfileChallengeEnabledInternal(userId);
     }
 
+    public byte getLockPatternSize(int userId) {
+        return mStorage.getLockPatternSize(userId);
+    }
+
     /**
      * Send credentials for user {@code userId} to {@link RecoverableKeyStoreManager} during an
      * unlock operation.
@@ -2469,6 +2474,7 @@ public class LockSettingsService extends ILockSettings.Stub {
                     PasswordMetrics.computeForCredential(newCredential),
                     userId);
             LocalServices.getService(WindowManagerInternal.class).reportPasswordChanged(userId);
+            LocalServices.getService(AppLockManagerServiceInternal.class).reportPasswordChanged(userId);
         });
     }
 
@@ -2693,7 +2699,10 @@ public class LockSettingsService extends ILockSettings.Stub {
             Secure.LOCK_PATTERN_ENABLED,
             Secure.LOCK_BIOMETRIC_WEAK_FLAGS,
             Secure.LOCK_PATTERN_VISIBLE,
-            Secure.LOCK_PATTERN_TACTILE_FEEDBACK_ENABLED
+            Secure.LOCK_PATTERN_TACTILE_FEEDBACK_ENABLED,
+            Secure.LOCK_PATTERN_SIZE,
+            Secure.LOCK_DOTS_VISIBLE,
+            Secure.LOCK_SHOW_ERROR_PATH
     };
 
     // Reading these settings needs the contacts permission

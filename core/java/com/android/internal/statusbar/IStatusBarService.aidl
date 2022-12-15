@@ -101,7 +101,7 @@ interface IStatusBarService
      * These methods are needed for global actions control which the UI is shown in sysui.
      */
     void shutdown();
-    void reboot(boolean safeMode);
+    void reboot(boolean safeMode, String reason);
 
     /** just restarts android without rebooting device. Used for some feature flags. */
     void restart();
@@ -226,4 +226,12 @@ interface IStatusBarService
 
     /** Unregisters a nearby media devices provider. */
     void unregisterNearbyMediaDevicesProvider(in INearbyMediaDevicesProvider provider);
+
+    /** Used to block or unblock usage of gestural navigation. */
+    void setBlockedGesturalNavigation(boolean blocked);
+
+    /**
+     * CustomUtils extensions
+     */
+    void toggleCameraFlash();
 }

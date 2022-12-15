@@ -401,7 +401,7 @@ public class QSTileHost implements QSHost, Tunable, PluginListener<QSFactory>, D
      */
     @Override
     public void removeTile(String spec) {
-        if (spec.startsWith(CustomTile.PREFIX)) {
+        if (spec!= null && spec.startsWith(CustomTile.PREFIX)) {
             // If the tile is removed (due to it not actually existing), mark it as removed. That
             // way it will be marked as newly added if it appears in the future.
             setTileAdded(CustomTile.getComponentFromSpec(spec), mCurrentUser, false);
@@ -628,20 +628,6 @@ public class QSTileHost implements QSHost, Tunable, PluginListener<QSFactory>, D
                     addedSpecs.add(tile);
                 }
             }
-        }
-
-        if (!tiles.contains("internet")) {
-            if (tiles.contains("wifi")) {
-                // Replace the WiFi with Internet, and remove the Cell
-                tiles.set(tiles.indexOf("wifi"), "internet");
-                tiles.remove("cell");
-            } else if (tiles.contains("cell")) {
-                // Replace the Cell with Internet
-                tiles.set(tiles.indexOf("cell"), "internet");
-            }
-        } else {
-            tiles.remove("wifi");
-            tiles.remove("cell");
         }
         return tiles;
     }

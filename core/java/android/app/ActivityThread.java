@@ -3804,7 +3804,7 @@ public final class ActivityThread extends ClientTransactionHandler
             return;
         }
         Configuration[] configurations = r.activity.getResources().getSizeConfigurations();
-        if (configurations == null) {
+        if (configurations == null || r.activity.mFinished) {
             return;
         }
         r.mSizeConfigurations = new SizeConfigurationBuckets(configurations);
@@ -4505,7 +4505,7 @@ public final class ActivityThread extends ClientTransactionHandler
         Service s = mServices.get(data.token);
         if (DEBUG_SERVICE)
             Slog.v(TAG, "handleBindService s=" + s + " rebind=" + data.rebind);
-        if (s != null) {
+        if (s != null && createData != null) {
             try {
                 data.intent.setExtrasClassLoader(s.getClassLoader());
                 data.intent.prepareToEnterProcess(isProtectedComponent(createData.info),
@@ -4536,7 +4536,7 @@ public final class ActivityThread extends ClientTransactionHandler
     private void handleUnbindService(BindServiceData data) {
         CreateServiceData createData = mServicesData.get(data.token);
         Service s = mServices.get(data.token);
-        if (s != null) {
+        if (s != null && createData != null) {
             try {
                 data.intent.setExtrasClassLoader(s.getClassLoader());
                 data.intent.prepareToEnterProcess(isProtectedComponent(createData.info),
@@ -4643,7 +4643,7 @@ public final class ActivityThread extends ClientTransactionHandler
     private void handleServiceArgs(ServiceArgsData data) {
         CreateServiceData createData = mServicesData.get(data.token);
         Service s = mServices.get(data.token);
-        if (s != null) {
+        if (s != null && createData != null) {
             try {
                 if (data.args != null) {
                     data.args.setExtrasClassLoader(s.getClassLoader());
@@ -4890,12 +4890,13 @@ public final class ActivityThread extends ClientTransactionHandler
                 l.softInputMode = (l.softInputMode
                         & (~WindowManager.LayoutParams.SOFT_INPUT_IS_FORWARD_NAVIGATION))
                         | forwardBit;
-                if (r.activity.mVisibleFromClient) {
-                    ViewManager wm = a.getWindowManager();
-                    View decor = r.window.getDecorView();
-                    wm.updateViewLayout(decor, l);
-                }
             }
+
+            if (r.activity.mVisibleFromClient) {
+                ViewManager wm = a.getWindowManager();
+                View decor = r.window.getDecorView();
+                wm.updateViewLayout(decor, l);
+             }
 
             r.activity.mVisibleFromServer = true;
             mNumVisibleActivities++;
@@ -7036,11 +7037,6 @@ public final class ActivityThread extends ClientTransactionHandler
             }
         }
         if (holder == null) {
-            if (UserManager.get(c).isUserUnlocked(userId)) {
-                Slog.e(TAG, "Failed to find provider info for " + auth);
-            } else {
-                Slog.w(TAG, "Failed to find provider info for " + auth + " (user not unlocked)");
-            }
             return null;
         }
 

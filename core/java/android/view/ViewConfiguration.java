@@ -31,6 +31,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.os.StrictMode;
+import android.os.SystemProperties;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.SparseArray;
@@ -74,7 +75,7 @@ public class ViewConfiguration {
      * a long press
      * @hide
      */
-    public static final int DEFAULT_LONG_PRESS_TIMEOUT = 400;
+    public static final int DEFAULT_LONG_PRESS_TIMEOUT = 250;
 
     /**
      * Defines the default duration in milliseconds between the first tap's up event and the second
@@ -92,7 +93,7 @@ public class ViewConfiguration {
      * appropriate button to bring up the global actions dialog (power off,
      * lock screen, etc).
      */
-    private static final int GLOBAL_ACTIONS_KEY_TIMEOUT = 500;
+    private static final int GLOBAL_ACTIONS_KEY_TIMEOUT = 250;
 
     /**
      * Defines the duration in milliseconds a user needs to hold down the
@@ -124,7 +125,7 @@ public class ViewConfiguration {
      * is a jump tap. If the user does not complete the jump tap within this interval, it is
      * considered to be a tap.
      */
-    private static final int JUMP_TAP_TIMEOUT = 500;
+    private static final int JUMP_TAP_TIMEOUT = 250;
 
     /**
      * Defines the duration in milliseconds between the first tap's up event and
@@ -158,12 +159,12 @@ public class ViewConfiguration {
      * Defines the duration in milliseconds we want to display zoom controls in response
      * to a user panning within an application.
      */
-    private static final int ZOOM_CONTROLS_TIMEOUT = 3000;
+    private static final int ZOOM_CONTROLS_TIMEOUT = 1500;
 
     /**
      * Inset in dips to look for touchable content when the user touches the edge of the screen
      */
-    private static final int EDGE_SLOP = 12;
+    private static final int EDGE_SLOP = 6;
 
     /**
      * Distance a touch can wander before we think the user is scrolling in dips.
@@ -222,7 +223,7 @@ public class ViewConfiguration {
     /**
      * Maximum velocity to initiate a fling, as measured in dips per second
      */
-    private static final int MAXIMUM_FLING_VELOCITY = 8000;
+    private static final int MAXIMUM_FLING_VELOCITY = 16000;
 
     /**
      * Delay before dispatching a recurring accessibility event in milliseconds.
@@ -243,7 +244,7 @@ public class ViewConfiguration {
      * The coefficient of friction applied to flings/scrolls.
      */
     @UnsupportedAppUsage
-    private static final float SCROLL_FRICTION = 0.015f;
+    private static final float SCROLL_FRICTION = 0.006f;
 
     /**
      * Max distance in dips to overscroll for edge effects
@@ -483,10 +484,49 @@ public class ViewConfiguration {
 
         mDoubleTapTouchSlop = mTouchSlop;
 
-        mMinimumFlingVelocity = res.getDimensionPixelSize(
-                com.android.internal.R.dimen.config_viewMinFlingVelocity);
-        mMaximumFlingVelocity = res.getDimensionPixelSize(
-                com.android.internal.R.dimen.config_viewMaxFlingVelocity);
+        // Modification by xdevs23 for better responsiveness using
+        // system.prop
+        String minFlingVeloProp = "ro.min.fling_velocity", // Min fling prop
+               maxFlingVeloProp = "ro.max.fling_velocity"; // Max fling prop
+        // Get the properties
+        String minFlingVeloSysProp = SystemProperties.get(minFlingVeloProp),
+               maxFlingVeloSysProp = SystemProperties.get(maxFlingVeloProp);
+        boolean isMaxFlingVeloPredefined = false,
+                isMinFlingVeloPredefined = false;
+        int minFlingVeloTmp = 0,
+            maxFlingVeloTmp = 0;
+
+        // Check whether the property values are valid
+        if(minFlingVeloSysProp != null && (!minFlingVeloSysProp.isEmpty()) &&
+            isNumeric(minFlingVeloSysProp)) {
+            minFlingVeloTmp = Integer.parseInt(minFlingVeloSysProp);
+            isMinFlingVeloPredefined = true;
+        }
+
+        if(maxFlingVeloSysProp != null && (!maxFlingVeloSysProp.isEmpty()) &&
+            isNumeric(maxFlingVeloSysProp)) {
+            maxFlingVeloTmp = Integer.parseInt(maxFlingVeloSysProp);
+            isMaxFlingVeloPredefined = true;
+        }
+
+        // Use config values if no prop available or invalid
+        if(!isMinFlingVeloPredefined && minFlingVeloTmp == 0)
+            minFlingVeloTmp = res.getDimensionPixelSize(
+                    com.android.internal.R.dimen.config_viewMinFlingVelocity);
+        if(!isMaxFlingVeloPredefined && maxFlingVeloTmp == 0)
+            maxFlingVeloTmp = res.getDimensionPixelSize(
+                    com.android.internal.R.dimen.config_viewMaxFlingVelocity);
+
+        // Check again for availability, otherwise use default values
+        if(minFlingVeloTmp * maxFlingVeloTmp == 0) {
+            minFlingVeloTmp = MINIMUM_FLING_VELOCITY;
+            maxFlingVeloTmp = MAXIMUM_FLING_VELOCITY;
+        }
+
+        // Assign the final variables
+        mMinimumFlingVelocity = minFlingVeloTmp;
+        mMaximumFlingVelocity = maxFlingVeloTmp;
+
         mGlobalActionsKeyTimeout = res.getInteger(
                 com.android.internal.R.integer.config_globalActionsKeyTimeout);
 
@@ -510,6 +550,15 @@ public class ViewConfiguration {
                 com.android.internal.R.integer.config_smartSelectionInitializingTimeoutMillis);
         mPreferKeepClearForFocusEnabled = res.getBoolean(
                 com.android.internal.R.bool.config_preferKeepClearForFocus);
+    }
+
+    public static boolean isNumeric(@NonNull String string) {
+        try {
+            Integer.parseInt(string);
+        } catch(NumberFormatException e) {
+            return false;
+        }
+        return true;
     }
 
     /**

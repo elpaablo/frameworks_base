@@ -858,6 +858,9 @@ public class PackageManagerService implements PackageSender, TestUtilityService 
 
     private final PackageProperty mPackageProperty = new PackageProperty();
 
+    ArrayList<ComponentName> mDisabledComponentsList;
+    ArrayList<ComponentName> mForceEnabledComponentsList;
+
     final PendingPackageBroadcasts mPendingBroadcasts;
 
     static final int SEND_PENDING_BROADCAST = 1;
@@ -1491,7 +1494,7 @@ public class PackageManagerService implements PackageSender, TestUtilityService 
         }
 
         PackageManagerService m = new PackageManagerService(injector, onlyCore, factoryTest,
-                PackagePartitions.FINGERPRINT, Build.IS_ENG, Build.IS_USERDEBUG,
+                Build.VERSION.INCREMENTAL, Build.IS_ENG, Build.IS_USERDEBUG,
                 Build.VERSION.SDK_INT, Build.VERSION.INCREMENTAL);
         t.traceEnd(); // "create package manager"
 
@@ -1546,6 +1549,38 @@ public class PackageManagerService implements PackageSender, TestUtilityService 
                 mExistingPackages)) {
             scheduleWritePackageRestrictions(UserHandle.USER_ALL);
             scheduleWriteSettings();
+        }
+    }
+
+    private void loadForceEnabledComponents(){
+        String[] components = mContext.getResources().getStringArray(
+                    com.android.internal.R.array.config_forceEnabledComponents);
+        for (String name : components) {
+            ComponentName cn = ComponentName.unflattenFromString(name);
+            mForceEnabledComponentsList.add(cn);
+        }
+    }
+
+    private void enableComponents(String[] components, boolean enable) {
+        // Disable or enable components marked at build-time
+        for (String name : components) {
+            ComponentName cn = ComponentName.unflattenFromString(name);
+            if (!enable) {
+                mDisabledComponentsList.add(cn);
+            }
+            Slog.v(TAG, "Changing enabled state of " + name + " to " + enable);
+            String className = cn.getClassName();
+            PackageSetting pkgSetting = mSettings.mPackages.get(cn.getPackageName());
+            if (pkgSetting == null || pkgSetting.getPkg() == null
+                    || !AndroidPackageUtils.hasComponentClassName(pkgSetting.getPkg(), className)) {
+                Slog.w(TAG, "Unable to change enabled state of " + name + " to " + enable);
+                continue;
+            }
+            if (enable) {
+                pkgSetting.enableComponentLPw(className, UserHandle.USER_OWNER);
+            } else {
+                pkgSetting.disableComponentLPw(className, UserHandle.USER_OWNER);
+            }
         }
     }
 
@@ -1953,7 +1988,7 @@ public class PackageManagerService implements PackageSender, TestUtilityService 
                     !buildFingerprint.equals(ver.fingerprint);
             if (mIsUpgrade) {
                 PackageManagerServiceUtils.logCriticalInfo(Log.INFO, "Upgrading from "
-                        + ver.fingerprint + " to " + PackagePartitions.FINGERPRINT);
+                        + ver.fingerprint + " to " + Build.VERSION.INCREMENTAL);
             }
 
             mInitAppsHelper = new InitAppsHelper(this, mApexManager, mInstallPackageHelper,
@@ -1983,7 +2018,7 @@ public class PackageManagerService implements PackageSender, TestUtilityService 
             }
 
             mCacheDir = PackageManagerServiceUtils.preparePackageParserCache(
-                    mIsEngBuild, mIsUserDebugBuild, mIncrementalVersion);
+                    mIsEngBuild, mIsUserDebugBuild, mIncrementalVersion, mIsUpgrade);
 
             final int[] userIds = mUserManager.getUserIds();
             PackageParser2 packageParser = mInjector.getScanningCachingPackageParser();
@@ -2068,7 +2103,7 @@ public class PackageManagerService implements PackageSender, TestUtilityService 
             // this situation.
             if (mIsUpgrade) {
                 Slog.i(TAG, "Build fingerprint changed from " + ver.fingerprint + " to "
-                        + PackagePartitions.FINGERPRINT
+                        + Build.VERSION.INCREMENTAL
                         + "; regranting permissions for internal storage");
             }
             mPermissionManager.onStorageVolumeMounted(
@@ -2083,6 +2118,19 @@ public class PackageManagerService implements PackageSender, TestUtilityService 
                     mSettings.applyDefaultPreferredAppsLPw(user.id);
                 }
             }
+
+            // Disable components marked for disabling at build-time
+            mDisabledComponentsList = new ArrayList<ComponentName>();
+            enableComponents(mContext.getResources().getStringArray(
+                    com.android.internal.R.array.config_deviceDisabledComponents), false);
+            enableComponents(mContext.getResources().getStringArray(
+                    com.android.internal.R.array.config_globallyDisabledComponents), false);
+
+            // Enable components marked for forced-enable at build-time
+            mForceEnabledComponentsList = new ArrayList<ComponentName>();
+            enableComponents(mContext.getResources().getStringArray(
+                    com.android.internal.R.array.config_forceEnabledComponents), true);
+            loadForceEnabledComponents();
 
             // If this is first boot after an OTA, and a normal boot, then
             // we need to clear code cache directories.
@@ -2101,7 +2149,7 @@ public class PackageManagerService implements PackageSender, TestUtilityService 
                                         | Installer.FLAG_CLEAR_APP_DATA_KEEP_ART_PROFILES);
                     }
                 }
-                ver.fingerprint = PackagePartitions.FINGERPRINT;
+                ver.fingerprint = Build.VERSION.INCREMENTAL;
             }
 
             // Defer the app data fixup until we are done with app data clearing above.
@@ -5567,6 +5615,20 @@ public class PackageManagerService implements PackageSender, TestUtilityService 
         public void setComponentEnabledSetting(ComponentName componentName,
                 int newState, int flags, int userId) {
             if (!mUserManager.exists(userId)) return;
+
+            // Don't allow to enable components marked for disabling at build-time
+            if (mDisabledComponentsList.contains(componentName)) {
+                Slog.d(TAG, "Ignoring attempt to set enabled state of disabled component "
+                        + componentName.flattenToString());
+                return;
+            }
+
+            // Don't allow to control components forced enabled at build-time
+            if (mForceEnabledComponentsList.contains(componentName)) {
+                Slog.d(TAG, "Ignoring attempt to control forced enabled component "
+                        + componentName.flattenToString());
+                return;
+            }
 
             setEnabledSettings(List.of(new PackageManager.ComponentEnabledSetting(componentName, newState, flags)),
                     userId, null /* callingPackage */);

@@ -17,8 +17,15 @@
 package com.android.systemui.statusbar.phone;
 
 import static com.android.systemui.statusbar.phone.fragment.dagger.StatusBarFragmentModule.OPERATOR_NAME_FRAME_VIEW;
+import static com.android.systemui.statusbar.policy.Clock.POSITION_CLOCK_GONE;
+import static com.android.systemui.statusbar.policy.Clock.POSITION_CLOCK_LEFT;
+import static com.android.systemui.statusbar.policy.Clock.POSITION_CLOCK_DEFAULT;
 
+import android.content.ContentResolver;
+import android.content.Context;
 import android.graphics.Rect;
+import android.os.UserHandle;
+import android.provider.Settings;
 import android.view.View;
 
 import com.android.internal.annotations.VisibleForTesting;
@@ -192,12 +199,13 @@ public class HeadsUpAppearanceController extends ViewController<HeadsUpStatusBar
             boolean animateIsolation = false;
             if (newEntry == null) {
                 // no heads up anymore, lets start the disappear animation
-
+                mNotificationPanelViewController.reTickerView(false);
                 setShown(false);
                 animateIsolation = !isExpanded();
             } else if (previousEntry == null) {
                 // We now have a headsUp and didn't have one before. Let's start the disappear
                 // animation
+                mNotificationPanelViewController.reTickerView(true);
                 setShown(true);
                 animateIsolation = !isExpanded();
             }
@@ -208,6 +216,8 @@ public class HeadsUpAppearanceController extends ViewController<HeadsUpStatusBar
     }
 
     private void setShown(boolean isShown) {
+        final int clockPosition = Settings.System.getIntForUser(mClockView.getContext().getContentResolver(),
+                Settings.System.STATUSBAR_CLOCK_POSITION, POSITION_CLOCK_DEFAULT, UserHandle.USER_CURRENT);
         if (mShown != isShown) {
             mShown = isShown;
             if (isShown) {
@@ -217,7 +227,11 @@ public class HeadsUpAppearanceController extends ViewController<HeadsUpStatusBar
                 hide(mClockView, View.INVISIBLE);
                 mOperatorNameViewOptional.ifPresent(view -> hide(view, View.INVISIBLE));
             } else {
-                show(mClockView);
+                if (clockPosition == POSITION_CLOCK_LEFT) {
+                    show(mClockView);
+                } else {
+                    mClockView.setVisibility(View.GONE);
+                }
                 mOperatorNameViewOptional.ifPresent(this::show);
                 hide(mView, View.GONE, () -> {
                     updateParentClipping(true /* shouldClip */);

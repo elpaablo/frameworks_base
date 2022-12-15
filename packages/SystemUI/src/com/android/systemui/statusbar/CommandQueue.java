@@ -162,6 +162,8 @@ public class CommandQueue extends IStatusBar.Stub implements
     private static final int MSG_REGISTER_NEARBY_MEDIA_DEVICE_PROVIDER = 66 << MSG_SHIFT;
     private static final int MSG_UNREGISTER_NEARBY_MEDIA_DEVICE_PROVIDER = 67 << MSG_SHIFT;
     private static final int MSG_TILE_SERVICE_REQUEST_LISTENING_STATE = 68 << MSG_SHIFT;
+    private static final int MSG_SET_BLOCKED_GESTURAL_NAVIGATION = 69 << MSG_SHIFT;
+    private static final int MSG_TOGGLE_CAMERA_FLASH = 100 << MSG_SHIFT;
 
     public static final int FLAG_EXCLUDE_NONE = 0;
     public static final int FLAG_EXCLUDE_SEARCH_PANEL = 1 << 0;
@@ -173,10 +175,10 @@ public class CommandQueue extends IStatusBar.Stub implements
     private static final String SHOW_IME_SWITCHER_KEY = "showImeSwitcherKey";
 
     private final Object mLock = new Object();
-    private ArrayList<Callbacks> mCallbacks = new ArrayList<>();
-    private Handler mHandler = new H(Looper.getMainLooper());
+    private final ArrayList<Callbacks> mCallbacks = new ArrayList<>();
+    private final Handler mHandler = new H(Looper.getMainLooper());
     /** A map of display id - disable flag pair */
-    private SparseArray<Pair<Integer, Integer>> mDisplayDisabled = new SparseArray<>();
+    private final SparseArray<Pair<Integer, Integer>> mDisplayDisabled = new SparseArray<>();
     /**
      * The last ID of the display where IME window for which we received setImeWindowStatus
      * event.
@@ -296,7 +298,7 @@ public class CommandQueue extends IStatusBar.Stub implements
         default void showPinningEnterExitToast(boolean entering) { }
         default void showPinningEscapeToast() { }
         default void handleShowGlobalActionsMenu() { }
-        default void handleShowShutdownUi(boolean isReboot, String reason) { }
+        default void handleShowShutdownUi(boolean isReboot, String reason, boolean rebootCustom) { }
 
         default void showWirelessChargingAnimation(int batteryLevel) {  }
 
@@ -470,6 +472,17 @@ public class CommandQueue extends IStatusBar.Stub implements
          */
         default void unregisterNearbyMediaDevicesProvider(
                 @NonNull INearbyMediaDevicesProvider provider) {}
+
+        /**
+         * API for Disabling Gestural Navigation
+         */
+        default void setBlockedGesturalNavigation(boolean blocked) {}
+
+
+        /**
+         * CustomUtils extensions
+         */
+        default void toggleCameraFlash() { }
     }
 
     public CommandQueue(Context context) {
@@ -889,11 +902,11 @@ public class CommandQueue extends IStatusBar.Stub implements
     }
 
     @Override
-    public void showShutdownUi(boolean isReboot, String reason) {
+    public void showShutdownUi(boolean isReboot, String reason, boolean rebootCustom) {
         synchronized (mLock) {
             mHandler.removeMessages(MSG_SHOW_SHUTDOWN_UI);
-            mHandler.obtainMessage(MSG_SHOW_SHUTDOWN_UI, isReboot ? 1 : 0, 0, reason)
-                    .sendToTarget();
+            mHandler.obtainMessage(MSG_SHOW_SHUTDOWN_UI, isReboot ? 1 : 0,
+                    rebootCustom ? 1 : 0, reason).sendToTarget();
         }
     }
 
@@ -1250,6 +1263,26 @@ public class CommandQueue extends IStatusBar.Stub implements
                 .sendToTarget();
     }
 
+    @Override
+    public void setBlockedGesturalNavigation(boolean blocked) {
+        synchronized (mLock) {
+            if (mHandler.hasMessages(MSG_SET_BLOCKED_GESTURAL_NAVIGATION)) {
+                mHandler.removeMessages(MSG_SET_BLOCKED_GESTURAL_NAVIGATION);
+            }
+            mHandler.obtainMessage(MSG_SET_BLOCKED_GESTURAL_NAVIGATION, blocked).sendToTarget();
+        }
+    }
+
+    @Override
+    public void toggleCameraFlash() {
+        synchronized (mLock) {
+            if (mHandler.hasMessages(MSG_TOGGLE_CAMERA_FLASH)) {
+                mHandler.removeMessages(MSG_TOGGLE_CAMERA_FLASH);
+            }
+            mHandler.sendEmptyMessage(MSG_TOGGLE_CAMERA_FLASH);
+        }
+    }
+
     private final class H extends Handler {
         private H(Looper l) {
             super(l);
@@ -1432,7 +1465,8 @@ public class CommandQueue extends IStatusBar.Stub implements
                     break;
                 case MSG_SHOW_SHUTDOWN_UI:
                     for (int i = 0; i < mCallbacks.size(); i++) {
-                        mCallbacks.get(i).handleShowShutdownUi(msg.arg1 != 0, (String) msg.obj);
+                        mCallbacks.get(i).handleShowShutdownUi(msg.arg1 != 0, (String) msg.obj,
+                                msg.arg2 != 0);
                     }
                     break;
                 case MSG_SET_TOP_APP_HIDES_STATUS_BAR:
@@ -1684,6 +1718,12 @@ public class CommandQueue extends IStatusBar.Stub implements
                     for (int i = 0; i < mCallbacks.size(); i++) {
                         mCallbacks.get(i).requestTileServiceListeningState(component);
                     }
+                    break;
+                case MSG_SET_BLOCKED_GESTURAL_NAVIGATION:
+                    mCallbacks.forEach(cb -> cb.setBlockedGesturalNavigation((Boolean) msg.obj));
+                    break;
+                case MSG_TOGGLE_CAMERA_FLASH:
+                    mCallbacks.forEach(cb -> cb.toggleCameraFlash());
                     break;
             }
         }

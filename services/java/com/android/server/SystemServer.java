@@ -231,6 +231,15 @@ import java.util.TreeSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 
+// LineageHardware
+import com.android.server.custom.LineageHardwareService;
+
+// CustomGlobalActionsService
+import com.android.server.custom.globalactions.CustomGlobalActionsService;
+
+// LiveDisplay
+import com.android.server.custom.display.LiveDisplayService;
+
 /**
  * Entry point to {@code system_server}.
  */
@@ -422,6 +431,9 @@ public final class SystemServer implements Dumpable {
             "com.android.server.adservices.AdServicesManagerService$Lifecycle";
 
     private static final String TETHERING_CONNECTOR_CLASS = "android.net.ITetheringConnector";
+
+    private static final String APP_LOCK_SERVICE_CLASS =
+            "com.android.server.app.AppLockManagerService$Lifecycle";
 
     private static final String PERSISTENT_DATA_BLOCK_PROP = "ro.frp.pst";
 
@@ -868,7 +880,7 @@ public final class SystemServer implements Dumpable {
             initZygoteChildHeapProfiling();
 
             // Debug builds - spawn a thread to monitor for fd leaks.
-            if (Build.IS_DEBUGGABLE) {
+            if (Build.IS_ENG) {
                 spawnFdLeakCheckThread();
             }
 
@@ -1006,7 +1018,7 @@ public final class SystemServer implements Dumpable {
                         Slog.e(TAG, "Error reading uncrypt package file", e);
                     }
 
-                    if (filename != null && filename.startsWith("/data")) {
+                    if (filename != null && filename.startsWith("/data") && SystemProperties.get("persist.sys.recovery_update", "").equals("true")) {
                         if (!new File(BLOCK_MAP_FILE).exists()) {
                             Slog.e(TAG, "Can't find block map file, uncrypt failed or " +
                                     "unexpected runtime restart?");
@@ -2470,6 +2482,10 @@ public final class SystemServer implements Dumpable {
             mSystemServiceManager.startService(AuthService.class);
             t.traceEnd();
 
+            t.traceBegin("AppLockManagerService");
+            mSystemServiceManager.startService(APP_LOCK_SERVICE_CLASS);
+            t.traceEnd();
+
             if (!isWatch) {
                 // We don't run this on watches as there are no plans to use the data logged
                 // on watch devices.
@@ -2512,6 +2528,26 @@ public final class SystemServer implements Dumpable {
             t.traceBegin("StartMediaMetricsManager");
             mSystemServiceManager.startService(MediaMetricsManagerService.class);
             t.traceEnd();
+
+            // LineageHardware
+            if (!mOnlyCore){
+                t.traceBegin("StartLineageHardwareService");
+                mSystemServiceManager.startService(LineageHardwareService.class);
+                t.traceEnd();
+            }
+
+            // CustomGlobalActionsService
+            if (!mOnlyCore){
+                t.traceBegin("StartCustomGlobalActionsService");
+                mSystemServiceManager.startService(CustomGlobalActionsService.class);
+                t.traceEnd();
+            }
+            // LiveDisplay
+            if (!mOnlyCore){
+                t.traceBegin("StartLiveDisplayService");
+                mSystemServiceManager.startService(LiveDisplayService.class);
+                t.traceEnd();
+            }
         }
 
         t.traceBegin("StartMediaProjectionManager");

@@ -16,7 +16,9 @@
 
 package com.android.systemui.shade
 
+import android.content.Context
 import android.hardware.display.AmbientDisplayConfiguration
+import android.os.PowerManager
 import android.os.SystemClock
 import android.os.UserHandle
 import android.provider.Settings
@@ -52,28 +54,48 @@ class PulsingGestureListener @Inject constructor(
         private val centralSurfaces: CentralSurfaces,
         private val ambientDisplayConfiguration: AmbientDisplayConfiguration,
         private val statusBarStateController: StatusBarStateController,
+        private val powerManager: PowerManager,
         tunerService: TunerService,
-        dumpManager: DumpManager
+        dumpManager: DumpManager,
+        context: Context
 ) : GestureDetector.SimpleOnGestureListener(), Dumpable {
-    private var doubleTapEnabled = false
+    private var dozeDoubleTapEnabled = false
     private var singleTapEnabled = false
+    private var doubleTapToWakeEnabled = false
+
+    companion object {
+        internal val DOUBLE_TAP_SLEEP_GESTURE =
+            "customsystem:" + Settings.System.DOUBLE_TAP_SLEEP_GESTURE
+    }
+    private var doubleTapToSleepEnabled = false
+    private val quickQsOffsetHeight: Int
 
     init {
-        val tunable = Tunable { key: String?, _: String? ->
+        val tunable = Tunable { key: String?, value: String? ->
             when (key) {
                 Settings.Secure.DOZE_DOUBLE_TAP_GESTURE ->
-                    doubleTapEnabled = ambientDisplayConfiguration.doubleTapGestureEnabled(
+                    dozeDoubleTapEnabled = ambientDisplayConfiguration.doubleTapGestureEnabled(
+                            UserHandle.USER_CURRENT)
+                Settings.Secure.DOUBLE_TAP_TO_WAKE ->
+                    doubleTapToWakeEnabled = ambientDisplayConfiguration.doubleTapToWakeEnabled(
                             UserHandle.USER_CURRENT)
                 Settings.Secure.DOZE_TAP_SCREEN_GESTURE ->
                     singleTapEnabled = ambientDisplayConfiguration.tapGestureEnabled(
                             UserHandle.USER_CURRENT)
+                DOUBLE_TAP_SLEEP_GESTURE ->
+                    doubleTapToSleepEnabled = TunerService.parseIntegerSwitch(value, true)
             }
         }
         tunerService.addTunable(tunable,
                 Settings.Secure.DOZE_DOUBLE_TAP_GESTURE,
-                Settings.Secure.DOZE_TAP_SCREEN_GESTURE)
+                Settings.Secure.DOZE_TAP_SCREEN_GESTURE,
+                Settings.Secure.DOUBLE_TAP_TO_WAKE,
+                DOUBLE_TAP_SLEEP_GESTURE)
 
         dumpManager.registerDumpable(this)
+
+        quickQsOffsetHeight = context.getResources().getDimensionPixelSize(
+                com.android.internal.R.dimen.quick_qs_offset_height)
     }
 
     override fun onSingleTapUp(e: MotionEvent): Boolean {
@@ -101,7 +123,7 @@ class PulsingGestureListener @Inject constructor(
         // checks MUST be on the ACTION_UP event.
         if (e.actionMasked == MotionEvent.ACTION_UP &&
                 statusBarStateController.isDozing &&
-                (doubleTapEnabled || singleTapEnabled) &&
+                (dozeDoubleTapEnabled || singleTapEnabled || doubleTapToWakeEnabled) &&
                 !falsingManager.isProximityNear &&
                 !falsingManager.isFalseDoubleTap
         ) {
@@ -110,13 +132,21 @@ class PulsingGestureListener @Inject constructor(
                     notificationShadeWindowView,
                     "PULSING_DOUBLE_TAP")
             return true
+        } else if (!statusBarStateController.isDozing &&
+                doubleTapToSleepEnabled &&
+                e.getY() < quickQsOffsetHeight
+        ) {
+            powerManager.goToSleep(e.getEventTime())
+            return true
         }
         return false
     }
 
     override fun dump(pw: PrintWriter, args: Array<out String>) {
         pw.println("singleTapEnabled=$singleTapEnabled")
-        pw.println("doubleTapEnabled=$doubleTapEnabled")
+        pw.println("doubleTapToWakeEnabled=$doubleTapToWakeEnabled")
+        pw.println("dozeDoubleTapEnabled=$dozeDoubleTapEnabled")
+        pw.println("doubleTapToSleepEnabled=$doubleTapToSleepEnabled")
         pw.println("isDocked=${dockManager.isDocked}")
         pw.println("isProxCovered=${falsingManager.isProximityNear}")
     }

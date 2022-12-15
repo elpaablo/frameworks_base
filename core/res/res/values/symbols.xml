@@ -1827,11 +1827,9 @@
   <java-symbol type="integer" name="config_carDockRotation" />
   <java-symbol type="integer" name="config_defaultUiModeType" />
   <java-symbol type="integer" name="config_deskDockRotation" />
-  <java-symbol type="integer" name="config_doubleTapOnHomeBehavior" />
   <java-symbol type="integer" name="config_lidKeyboardAccessibility" />
   <java-symbol type="integer" name="config_lidNavigationAccessibility" />
   <java-symbol type="integer" name="config_lidOpenRotation" />
-  <java-symbol type="integer" name="config_longPressOnHomeBehavior" />
   <java-symbol type="layout" name="global_actions" />
   <java-symbol type="layout" name="global_actions_item" />
   <java-symbol type="layout" name="global_actions_silent_mode" />
@@ -3502,6 +3500,16 @@
   <java-symbol type="string" name="config_signalAttributionPath" />
   <java-symbol type="dimen" name="config_signalCutoutWidthFraction" />
   <java-symbol type="dimen" name="config_signalCutoutHeightFraction" />
+  <java-symbol type="string" name="config_batterymeterRLandPerimeterPath" />
+  <java-symbol type="string" name="config_batterymeterRLandFillMask" />
+  <java-symbol type="string" name="config_batterymeterRLandBoltPath" />
+  <java-symbol type="string" name="config_batterymeterRLandPowersavePath" />
+  <java-symbol type="string" name="config_batterymeterRLandErrorPerimeterPath" />
+  <java-symbol type="string" name="config_batterymeterLandPerimeterPath" />
+  <java-symbol type="string" name="config_batterymeterLandFillMask" />
+  <java-symbol type="string" name="config_batterymeterLandBoltPath" />
+  <java-symbol type="string" name="config_batterymeterLandPowersavePath" />
+  <java-symbol type="string" name="config_batterymeterLandErrorPerimeterPath" />
 
   <java-symbol type="bool" name="config_debugEnableAutomaticSystemServerHeapDumps" />
   <java-symbol type="integer" name="config_debugSystemServerPssThresholdBytes" />
@@ -3811,6 +3819,8 @@
   <java-symbol type="integer" name="config_storageManagerDaystoRetainDefault" />
   <java-symbol type="string" name="config_headlineFontFamily" />
   <java-symbol type="string" name="config_headlineFontFamilyMedium" />
+  <java-symbol type="string" name="config_bodyFontFamily" />
+  <java-symbol type="string" name="config_bodyFontFamilyMedium" />
 
   <java-symbol type="drawable" name="stat_sys_vitals" />
 

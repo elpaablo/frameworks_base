@@ -280,7 +280,7 @@ public class AuthController extends CoreStartable implements CommandQueue.Callba
         mUdfpsProps = !udfpsProps.isEmpty() ? udfpsProps : null;
         if (mUdfpsProps != null) {
             mUdfpsController = mUdfpsControllerFactory.get();
-            mUdfpsController.addCallback(new UdfpsController.Callback() {
+            /*mUdfpsController.addCallback(new UdfpsController.Callback() {
                 @Override
                 public void onFingerUp() {
                 }
@@ -291,7 +291,7 @@ public class AuthController extends CoreStartable implements CommandQueue.Callba
                         mCurrentDialog.onPointerDown();
                     }
                 }
-            });
+            });*/
             mUdfpsController.setAuthControllerUpdateUdfpsLocation(this::updateUdfpsLocation);
             mUdfpsBounds = mUdfpsProps.get(0).getLocation().getRect();
         }

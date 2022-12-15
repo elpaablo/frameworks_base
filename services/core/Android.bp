@@ -19,7 +19,10 @@ filegroup {
 
 filegroup {
     name: "services.core-sources",
-    srcs: ["java/**/*.java"],
+    srcs: [
+        "java/**/*.java",
+        "java/**/*.kt",
+    ],
     exclude_srcs: [
         ":services.core-sources-am-wm",
     ],
@@ -170,9 +173,14 @@ java_library_static {
         "capture_state_listener-aidl-java",
         "icu4j_calendar_astronomer",
         "netd-client",
+        "motorola.hardware.health-V1.0-java",
         "overlayable_policy_aidl-java",
         "SurfaceFlingerProperties",
         "com.android.sysprop.watchdog",
+        "faceunlock_framework",
+        "kotlin-stdlib",
+        "kotlinx_coroutines_android",
+        "kotlinx_coroutines",
     ],
     javac_shard_size: 50,
 }

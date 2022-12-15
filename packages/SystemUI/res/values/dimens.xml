@@ -436,7 +436,7 @@
 
     <dimen name="brightness_mirror_height">48dp</dimen>
 
-    <dimen name="volume_dialog_panel_transparent_padding_right">8dp</dimen>
+    <dimen name="volume_dialog_panel_transparent_padding_horizontal">8dp</dimen>
 
     <dimen name="volume_dialog_panel_transparent_padding">20dp</dimen>
 
@@ -475,7 +475,7 @@
 
     <dimen name="volume_dialog_background_blur_radius">0dp</dimen>
 
-    <dimen name="volume_tool_tip_right_margin">76dp</dimen>
+    <dimen name="volume_tool_tip_horizontal_margin">76dp</dimen>
 
     <dimen name="volume_tool_tip_arrow_corner_radius">2dp</dimen>
 
@@ -867,9 +867,9 @@
     <dimen name="global_actions_controls_y_translation">20dp</dimen>
 
     <!-- Shutdown and restart actions are larger in power options dialog -->
-    <dimen name="global_actions_power_dialog_item_height">190dp</dimen>
-    <dimen name="global_actions_power_dialog_item_width">255dp</dimen>
-    <dimen name="global_actions_power_dialog_item_bottom_margin">45dp</dimen>
+    <dimen name="global_actions_power_dialog_item_height">128dp</dimen>
+    <dimen name="global_actions_power_dialog_item_width">128dp</dimen>
+    <dimen name="global_actions_power_dialog_item_bottom_margin">22dp</dimen>
 
     <!-- Power Menu Lite -->
     <dimen name="global_actions_button_size">96dp</dimen>
@@ -1399,6 +1399,8 @@
     <dimen name="internet_dialog_list_max_height">662dp</dimen>
     <!-- The height of the WiFi network in Internet panel. -->
     <dimen name="internet_dialog_wifi_network_height">72dp</dimen>
+    <!-- The height of the WiFi toggle layout in Internet panel -->
+    <dimen name="internet_dialog_wifi_toggle_height">56dp</dimen>
 
     <!-- The width of large/content heavy dialogs (e.g. Internet, Media output, etc) -->
     <dimen name="large_dialog_width">@dimen/match_parent</dimen>

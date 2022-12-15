@@ -125,8 +125,11 @@ android_library {
         "jsr330",
         "lottie",
         "LowLightDreamLib",
+        "vendor.lineage.powershare-V1.0-java",
+        "faceunlock_framework",
     ],
     manifest: "AndroidManifest.xml",
+    additional_manifests: ["CustomManifest.xml"],
 
     kotlincflags: ["-Xjvm-default=enable"],
 
@@ -229,6 +232,7 @@ android_library {
         "jsr330",
         "WindowManager-Shell",
         "LowLightDreamLib",
+        "vendor.lineage.powershare-V1.0-java",
     ],
     libs: [
         "android.test.runner",

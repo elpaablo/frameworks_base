@@ -95,7 +95,7 @@ class AuthRippleController @Inject constructor(
         authController.addCallback(authControllerCallback)
         updateRippleColor()
         updateUdfpsDependentParams()
-        udfpsController?.addCallback(udfpsControllerCallback)
+        //udfpsController?.addCallback(udfpsControllerCallback)
         configurationController.addCallback(configurationChangedListener)
         keyguardUpdateMonitor.registerCallback(keyguardUpdateMonitorCallback)
         keyguardStateController.addCallback(this)
@@ -105,7 +105,7 @@ class AuthRippleController @Inject constructor(
 
     @VisibleForTesting
     public override fun onViewDetached() {
-        udfpsController?.removeCallback(udfpsControllerCallback)
+        //udfpsController?.removeCallback(udfpsControllerCallback)
         authController.removeCallback(authControllerCallback)
         keyguardUpdateMonitor.removeCallback(keyguardUpdateMonitorCallback)
         configurationController.removeCallback(configurationChangedListener)
@@ -318,9 +318,9 @@ class AuthRippleController @Inject constructor(
                 udfpsController = udfpsControllerProvider.get()
                 udfpsRadius = authController.udfpsRadius
 
-                if (mView.isAttachedToWindow) {
+                /*if (mView.isAttachedToWindow) {
                     udfpsController?.addCallback(udfpsControllerCallback)
-                }
+                }*/
             }
         }
     }
