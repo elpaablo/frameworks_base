@@ -50,7 +50,6 @@ import com.android.systemui.statusbar.phone.StatusBarIconController;
 import com.android.systemui.statusbar.phone.StatusBarIconController.TintedIconManager;
 import com.android.systemui.statusbar.phone.StatusIconContainer;
 import com.android.systemui.statusbar.policy.Clock;
-import com.android.systemui.statusbar.policy.ClockEQS;
 import com.android.systemui.statusbar.policy.NetworkTraffic;
 import com.android.systemui.statusbar.policy.VariableDateView;
 import com.android.systemui.util.LargeScreenUtils;
@@ -162,7 +161,6 @@ public class QuickStatusBarHeader extends FrameLayout implements TunerService.Tu
         mPrivacyContainer = findViewById(R.id.privacy_container);
 
         mClockContainer = findViewById(R.id.clock_container);
-        mClockView = findViewById(R.id.clock_eqs);
         mClockView.setOnClickListener(
                 v -> mActivityStarter.postStartActivityDismissingKeyguard(
                         new Intent(AlarmClock.ACTION_SHOW_ALARMS), 0));
@@ -428,7 +426,6 @@ public class QuickStatusBarHeader extends FrameLayout implements TunerService.Tu
         if (mExpanded == expanded) return;
         mExpanded = expanded;
         quickQSPanelController.setExpanded(expanded);
-	mDateView.setVisibility(mClockView.isClockDateEnabled() ? View.INVISIBLE : View.VISIBLE);
         updateEverything();
     }
 
@@ -604,8 +601,6 @@ public class QuickStatusBarHeader extends FrameLayout implements TunerService.Tu
 
     @Override
     public void onTuningChanged(String key, String newValue) {
-        mClockView.setClockVisibleByUser(!StatusBarIconController.getIconHideList(
-                mContext, newValue).contains("clock"));
         switch (key) {
             case NETWORK_TRAFFIC_LOCATION:
                 int networkTrafficState = TunerService.parseInteger(newValue, 0);
