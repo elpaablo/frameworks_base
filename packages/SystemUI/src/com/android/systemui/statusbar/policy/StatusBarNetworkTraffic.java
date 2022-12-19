@@ -19,8 +19,8 @@ package com.android.systemui.statusbar.policy;
 import static com.android.systemui.statusbar.StatusBarIconView.STATE_DOT;
 import static com.android.systemui.statusbar.StatusBarIconView.STATE_HIDDEN;
 import static com.android.systemui.statusbar.StatusBarIconView.STATE_ICON;
-import static com.android.systemui.statusbar.phone.ClockController.CLOCK_POSITION_DEFAULT;
-import static com.android.systemui.statusbar.phone.ClockController.CLOCK_POSITION_LEFT;
+import static com.android.internal.util.custom.clock.ClockConstants.CLOCK_POSITION_DEFAULT;
+import static com.android.internal.util.custom.clock.ClockConstants.CLOCK_POSITION_LEFT;
 
 import android.content.Context;
 import android.graphics.Rect;

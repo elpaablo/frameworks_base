@@ -17,7 +17,7 @@
 package com.android.systemui.statusbar.phone;
 
 import static com.android.systemui.statusbar.phone.fragment.dagger.StatusBarFragmentModule.OPERATOR_NAME_FRAME_VIEW;
-import static com.android.systemui.statusbar.phone.ClockController.CLOCK_POSITION_DEFAULT;
+import static com.android.internal.util.custom.clock.ClockConstants.CLOCK_POSITION_DEFAULT;
 
 import android.content.ContentResolver;
 import android.content.Context;

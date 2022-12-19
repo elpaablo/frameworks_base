@@ -45,9 +45,9 @@ import static com.android.systemui.statusbar.phone.BarTransitions.MODE_OPAQUE;
 import static com.android.systemui.statusbar.phone.BarTransitions.MODE_SEMI_TRANSPARENT;
 import static com.android.systemui.statusbar.phone.BarTransitions.MODE_TRANSPARENT;
 import static com.android.systemui.statusbar.phone.BarTransitions.TransitionMode;
-import static com.android.systemui.statusbar.phone.ClockController.CLOCK_POSITION_DEFAULT;
-import static com.android.systemui.statusbar.phone.ClockController.CLOCK_POSITION_LEFT;
-import static com.android.systemui.statusbar.phone.ClockController.CLOCK_POSITION_CENTER;
+import static com.android.internal.util.custom.clock.ClockConstants.CLOCK_POSITION_DEFAULT;
+import static com.android.internal.util.custom.clock.ClockConstants.CLOCK_POSITION_LEFT;
+import static com.android.internal.util.custom.clock.ClockConstants.CLOCK_POSITION_CENTER;
 
 import android.annotation.Nullable;
 import android.app.ActivityManager;

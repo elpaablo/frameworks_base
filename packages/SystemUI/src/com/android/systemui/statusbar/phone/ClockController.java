@@ -16,6 +16,12 @@
 
 package com.android.systemui.statusbar.phone;
 
+import static com.android.internal.util.custom.clock.ClockConstants.CLOCK_POSITION_RIGHT;
+import static com.android.internal.util.custom.clock.ClockConstants.CLOCK_POSITION_CENTER;
+import static com.android.internal.util.custom.clock.ClockConstants.CLOCK_POSITION_LEFT;
+import static com.android.internal.util.custom.clock.ClockConstants.CLOCK_POSITION_HIDE;
+import static com.android.internal.util.custom.clock.ClockConstants.CLOCK_POSITION_DEFAULT;
+
 import android.content.Context;
 import android.provider.Settings;
 import android.util.Log;
@@ -33,12 +39,6 @@ public class ClockController implements TunerService.Tunable {
 
     private static final String STATUS_BAR_CLOCK =
             "system:" + Settings.System.STATUS_BAR_CLOCK;
-
-    public static final int CLOCK_POSITION_RIGHT = 0;
-    public static final int CLOCK_POSITION_CENTER = 1;
-    public static final int CLOCK_POSITION_LEFT = 2;
-    public static final int CLOCK_POSITION_HIDE = 3;
-    public static final int CLOCK_POSITION_DEFAULT = CLOCK_POSITION_LEFT;
 
     private Context mContext;
     private Clock mActiveClock, mCenterClock, mLeftClock, mRightClock;
