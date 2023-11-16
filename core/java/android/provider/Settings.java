@@ -5969,12 +5969,6 @@ public final class Settings {
         public static final String QS_SHOW_BATTERY_PERCENT = "qs_show_battery_percent";
 
         /**
-         * Haptic feedback on brightness slider
-         * @hide
-         */
-        public static final String QS_BRIGHTNESS_SLIDER_HAPTIC = "qs_brightness_slider_haptic";
-
-        /**
          * Whether to disable qs on secure lockscreen.
          * @hide
          */
