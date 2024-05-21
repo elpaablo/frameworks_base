@@ -118,6 +118,7 @@ public final class ColorDisplayService extends SystemService {
     private static final int MSG_APPLY_DISPLAY_WHITE_BALANCE = 5;
     private static final int MSG_APPLY_REDUCE_BRIGHT_COLORS = 6;
     private static final int MSG_APPLY_DISPLAY_COLOR_BALANCE = 7;
+    private static final int MSG_APPLY_UPDATE_DISPLAY_ENGINE = 8;
 
     /**
      * Return value if a setting has not been set.
@@ -370,6 +371,9 @@ public final class ColorDisplayService extends SystemService {
                             case Secure.DISPLAY_COLOR_BALANCE_GREEN:
                                 mHandler.sendEmptyMessage(MSG_APPLY_DISPLAY_COLOR_BALANCE);
                                 break;
+                            case ColorBalanceTintController.X_REALITY_ENGINE_ENABLED:
+                                mHandler.sendEmptyMessage(MSG_APPLY_UPDATE_DISPLAY_ENGINE);
+                                break;
                             case Secure.DISPLAY_WHITE_BALANCE_ENABLED:
                                 updateDisplayWhiteBalanceStatus();
                                 break;
@@ -413,6 +417,8 @@ public final class ColorDisplayService extends SystemService {
         cr.registerContentObserver(Secure.getUriFor(Secure.DISPLAY_COLOR_BALANCE_GREEN),
                 false /* notifyForDescendants */, mContentObserver, mCurrentUser);
         cr.registerContentObserver(Secure.getUriFor(Secure.DISPLAY_COLOR_BALANCE_BLUE),
+                false /* notifyForDescendants */, mContentObserver, mCurrentUser);
+        cr.registerContentObserver(Secure.getUriFor(ColorBalanceTintController.X_REALITY_ENGINE_ENABLED),
                 false /* notifyForDescendants */, mContentObserver, mCurrentUser);
         cr.registerContentObserver(Secure.getUriFor(Secure.DISPLAY_WHITE_BALANCE_ENABLED),
                 false /* notifyForDescendants */, mContentObserver, mCurrentUser);
@@ -475,6 +481,7 @@ public final class ColorDisplayService extends SystemService {
 
         if (mColorBalanceTintController.isAvailable(getContext())) {
             mHandler.sendEmptyMessage(MSG_APPLY_DISPLAY_COLOR_BALANCE);
+            mHandler.sendEmptyMessage(MSG_APPLY_UPDATE_DISPLAY_ENGINE);
         }
     }
 
@@ -1769,6 +1776,7 @@ public final class ColorDisplayService extends SystemService {
                     applyTintByCct(mDisplayWhiteBalanceTintController, false);
                     break;
                 case MSG_APPLY_DISPLAY_COLOR_BALANCE:
+                case MSG_APPLY_UPDATE_DISPLAY_ENGINE:
                     mColorBalanceTintController.updateBalance(getContext(), mCurrentUser);
                     applyTint(mColorBalanceTintController, true);
                     break;
